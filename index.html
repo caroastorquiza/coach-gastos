@@ -11,780 +11,856 @@
 <link rel="manifest" href="manifest.json">
 <style>
 :root {
-  --bg:#0a0a0f; --bg2:#13131a; --bg3:#1c1c26;
-  --border:rgba(255,255,255,0.07);
-  --accent:#7c6aff; --accent2:#5eead4; --red:#ef4444;
-  --green:#22c55e; --amber:#f59e0b; --text:#f0f0f8; --muted:#6b6b85;
+  --bg: #0a0a0f;
+  --bg2: #13131a;
+  --bg3: #1c1c26;
+  --border: rgba(255,255,255,0.07);
+  --accent: #7c6aff;
+  --accent2: #5eead4;
+  --accent3: #f97316;
+  --red: #ef4444;
+  --green: #22c55e;
+  --amber: #f59e0b;
+  --text: #f0f0f8;
+  --muted: #6b6b85;
+  --card-r: 16px;
+  --font: 'DM Sans', system-ui, sans-serif;
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;overflow:hidden}
-#root{height:100dvh;height:100vh;display:flex;flex-direction:column}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); overflow: hidden; }
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+/* ── LAYOUT ── */
+#app { display: flex; flex-direction: column; height: 100dvh; height: 100vh; }
+#screen { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: 90px; }
+#nav { position: fixed; bottom: 0; left: 0; right: 0; height: 74px; background: rgba(10,10,15,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 0.5px solid var(--border); display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+.nav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: none; border: none; color: var(--muted); font-size: 10px; font-family: var(--font); cursor: pointer; transition: color 0.2s; padding-top: 8px; }
+.nav-btn.active { color: var(--accent); }
+.nav-btn svg { width: 22px; height: 22px; }
+
+/* ── PAGES ── */
+.page { display: none; padding: 0; }
+.page.active { display: block; }
+
+/* ── HEADER ── */
+.page-header { padding: 52px 20px 20px; background: linear-gradient(180deg, rgba(124,106,255,0.08) 0%, transparent 100%); }
+.page-header h1 { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; }
+.page-header p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+/* ── CARDS ── */
+.card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: var(--card-r); padding: 16px; margin: 0 16px 12px; }
+.card-sm { padding: 12px 14px; }
+
+/* ── HERO METRIC ── */
+.hero { margin: 0 16px 12px; background: var(--bg2); border: 0.5px solid var(--border); border-radius: 20px; padding: 24px 20px; position: relative; overflow: hidden; }
+.hero::before { content:''; position:absolute; top:-40px; right:-40px; width:160px; height:160px; background: radial-gradient(circle, rgba(124,106,255,0.15) 0%, transparent 70%); }
+.hero-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500; }
+.hero-amount { font-size: 42px; font-weight: 300; letter-spacing: -2px; margin: 6px 0 2px; font-family: 'DM Mono', monospace; }
+.hero-amount span { font-size: 22px; font-weight: 400; color: var(--muted); margin-right: 2px; }
+.hero-sub { font-size: 12px; color: var(--muted); }
+.hero-row { display: flex; gap: 16px; margin-top: 18px; }
+.hero-stat { flex: 1; }
+.hero-stat-val { font-size: 18px; font-weight: 500; font-family: 'DM Mono', monospace; }
+.hero-stat-lab { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+/* ── PROGRESS BARS ── */
+.progress-wrap { margin-top: 10px; height: 6px; background: var(--bg3); border-radius: 99px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 99px; transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+.prog-green { background: var(--green); }
+.prog-amber { background: var(--amber); }
+.prog-red   { background: var(--red); }
+.prog-accent{ background: var(--accent); }
+
+/* ── BUDGET ROWS ── */
+.budget-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+.budget-row:last-child { border-bottom: none; }
+.bcat-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.bcat-info { flex: 1; min-width: 0; }
+.bcat-name { font-size: 13px; font-weight: 500; }
+.bcat-detail { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.bcat-amounts { text-align: right; flex-shrink: 0; }
+.bcat-spent { font-size: 14px; font-weight: 600; font-family: 'DM Mono', monospace; }
+.bcat-budget { font-size: 10px; color: var(--muted); }
+.badge-pill { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
+.pill-ok     { background: rgba(34,197,94,0.15); color: #4ade80; }
+.pill-warn   { background: rgba(245,158,11,0.15); color: #fbbf24; }
+.pill-over   { background: rgba(239,68,68,0.15);  color: #f87171; }
+.pill-neutral{ background: rgba(255,255,255,0.07); color: var(--muted); }
+
+/* ── GRID 2COL ── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 16px 12px; }
+.stat-card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: 14px; padding: 14px; }
+.stat-val { font-size: 20px; font-weight: 600; font-family: 'DM Mono', monospace; margin-bottom: 2px; }
+.stat-lab { font-size: 11px; color: var(--muted); }
+
+/* ── SECTION TITLE ── */
+.sec-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500; padding: 16px 20px 8px; }
+
+/* ── ADD GASTO ── */
+.fab { position: fixed; bottom: 90px; right: 20px; width: 54px; height: 54px; border-radius: 50%; background: var(--accent); border: none; color: white; font-size: 26px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 20px rgba(124,106,255,0.4); z-index: 99; transition: transform 0.15s, box-shadow 0.15s; }
+.fab:active { transform: scale(0.92); box-shadow: 0 2px 10px rgba(124,106,255,0.3); }
+
+/* ── MODAL ── */
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 200; display: none; align-items: flex-end; }
+.modal-bg.open { display: flex; }
+.modal { background: var(--bg2); border-radius: 24px 24px 0 0; padding: 24px 20px 40px; width: 100%; max-height: 90vh; overflow-y: auto; border-top: 0.5px solid var(--border); }
+.modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 99px; margin: 0 auto 20px; }
+.modal h2 { font-size: 18px; font-weight: 600; margin-bottom: 20px; }
+.form-group { margin-bottom: 16px; }
+.form-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; display: block; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+.form-input { width: 100%; background: var(--bg3); border: 0.5px solid var(--border); border-radius: 12px; padding: 13px 14px; color: var(--text); font-size: 16px; font-family: var(--font); outline: none; -webkit-appearance: none; }
+.form-input:focus { border-color: var(--accent); }
+.cat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.cat-chip { background: var(--bg3); border: 0.5px solid var(--border); border-radius: 10px; padding: 10px 6px; text-align: center; cursor: pointer; font-size: 11px; color: var(--muted); transition: all 0.15s; }
+.cat-chip.sel { background: rgba(124,106,255,0.15); border-color: var(--accent); color: var(--accent); }
+.cat-chip-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+.btn-primary { width: 100%; background: var(--accent); border: none; border-radius: 14px; padding: 16px; color: white; font-size: 16px; font-weight: 600; font-family: var(--font); cursor: pointer; margin-top: 8px; transition: opacity 0.15s; }
+.btn-primary:active { opacity: 0.8; }
+.btn-secondary { width: 100%; background: var(--bg3); border: 0.5px solid var(--border); border-radius: 14px; padding: 14px; color: var(--muted); font-size: 15px; font-family: var(--font); cursor: pointer; margin-top: 8px; }
+
+/* ── TRANSACTIONS ── */
+.tx-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 0.5px solid var(--border); }
+.tx-row:last-child { border-bottom: none; }
+.tx-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+.tx-info { flex: 1; min-width: 0; }
+.tx-desc { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tx-meta { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.tx-amount { font-size: 14px; font-weight: 600; font-family: 'DM Mono', monospace; color: var(--red); flex-shrink: 0; }
+
+/* ── SETTINGS ── */
+.setting-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 0.5px solid var(--border); }
+.setting-row:last-child { border-bottom: none; }
+.setting-label { font-size: 14px; font-weight: 500; }
+.setting-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.setting-val { font-size: 14px; color: var(--accent); font-weight: 500; font-family: 'DM Mono', monospace; }
+
+/* ── ALERT BANNER ── */
+.alert-banner { margin: 0 16px 12px; padding: 12px 14px; border-radius: 12px; display: flex; gap: 10px; align-items: flex-start; }
+.alert-warn { background: rgba(245,158,11,0.1); border: 0.5px solid rgba(245,158,11,0.3); }
+.alert-danger { background: rgba(239,68,68,0.1); border: 0.5px solid rgba(239,68,68,0.3); }
+.alert-ok { background: rgba(34,197,94,0.1); border: 0.5px solid rgba(34,197,94,0.3); }
+.alert-icon { font-size: 18px; flex-shrink: 0; }
+.alert-text { font-size: 12px; line-height: 1.5; color: var(--text); }
+.alert-text strong { font-weight: 600; }
+
+/* ── MINI CHART ── */
+canvas { display: block; }
+
+/* ── EMPTY STATE ── */
+.empty { text-align: center; padding: 48px 24px; color: var(--muted); }
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty p { font-size: 14px; line-height: 1.6; }
+
+/* ── DELETE BTN ── */
+.del-btn { background: none; border: none; color: var(--muted); font-size: 18px; cursor: pointer; padding: 4px 8px; }
+
+/* ── CUOTAS SECTION ── */
+.cuota-pill { display: inline-flex; align-items: center; gap: 6px; background: rgba(94,234,212,0.1); border: 0.5px solid rgba(94,234,212,0.2); border-radius: 99px; padding: 4px 10px; font-size: 11px; color: var(--accent2); font-weight: 500; margin: 3px; }
+
+/* Month selector */
+.month-sel { display: flex; align-items: center; justify-content: space-between; padding: 0 20px; margin-bottom: 4px; }
+.month-btn { background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; padding: 4px 8px; }
+.month-name { font-size: 15px; font-weight: 500; }
 </style>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 </head>
 <body>
-<div id="root"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script type="importmap">{"imports":{"react":"https://esm.sh/react@18","react-dom/client":"https://esm.sh/react-dom@18/client"}}</script>
-<script type="module">
-import React,{useState,useEffect,useRef,useCallback}from'react';
-import{createRoot}from'react-dom/client';
+<div id="app">
+  <div id="screen">
+    <!-- HOME -->
+    <div class="page active" id="p-home">
+      <div class="page-header">
+        <div class="month-sel">
+          <button class="month-btn" onclick="changeMonth(-1)">‹</button>
+          <span class="month-name" id="month-display">Mayo 2026</span>
+          <button class="month-btn" onclick="changeMonth(1)">›</button>
+        </div>
+      </div>
 
-// ── CONSTANTS ─────────────────────────────────────────────────
-const CATS=[
-  {id:'comida',    label:'Comida',    icon:'🍽️', color:'#22c55e',bg:'rgba(34,197,94,0.12)'},
-  {id:'delivery',  label:'Delivery',  icon:'🛵', color:'#f97316',bg:'rgba(249,115,22,0.12)'},
-  {id:'transporte',label:'Transporte',icon:'🚗', color:'#f59e0b',bg:'rgba(245,158,11,0.12)'},
-  {id:'salud',     label:'Salud',     icon:'🏥', color:'#06b6d4',bg:'rgba(6,182,212,0.12)'},
-  {id:'mall',      label:'Mall/Ropa', icon:'🛍️', color:'#ec4899',bg:'rgba(236,72,153,0.12)'},
-  {id:'panoramas', label:'Panoramas', icon:'✈️', color:'#a855f7',bg:'rgba(168,85,247,0.12)'},
-  {id:'fijo',      label:'Gasto fijo',icon:'🔒', color:'#3b82f6',bg:'rgba(59,130,246,0.12)'},
-  {id:'otros',     label:'Otros',     icon:'📦', color:'#6b7280',bg:'rgba(107,114,128,0.12)'},
+      <div class="hero">
+        <div class="hero-label">Facturación estimada del mes</div>
+        <div class="hero-amount" id="h-total"><span>$</span><span id="h-total-val">0</span></div>
+        <div class="hero-sub">Meta: <strong id="h-meta-disp">$800.000</strong> · <span id="h-days-left">— días restantes</span></div>
+        <div class="progress-wrap" style="margin-top:14px;height:8px;">
+          <div class="progress-fill" id="h-prog" style="width:0%"></div>
+        </div>
+        <div class="hero-row">
+          <div class="hero-stat">
+            <div class="hero-stat-val" id="h-rot">$0</div>
+            <div class="hero-stat-lab">Rotativo ingresado</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-val" id="h-cuotas">$0</div>
+            <div class="hero-stat-lab">Cuotas del período</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-val" id="h-resta" style="color:var(--accent2)">$0</div>
+            <div class="hero-stat-lab">Disponible</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="alerts-container"></div>
+
+      <div class="sec-title">Presupuesto por categoría</div>
+      <div class="card">
+        <div id="budget-rows"></div>
+      </div>
+
+      <div class="sec-title">Últimos movimientos</div>
+      <div class="card" id="recent-txs">
+        <div class="empty"><div class="empty-icon">🧾</div><p>Sin movimientos aún.<br>Toca + para agregar un cobro.</p></div>
+      </div>
+    </div>
+
+    <!-- GASTOS -->
+    <div class="page" id="p-gastos">
+      <div class="page-header">
+        <h1>Movimientos</h1>
+        <p id="tx-count-label">0 movimientos este mes</p>
+      </div>
+      <div class="card" id="all-txs">
+        <div class="empty"><div class="empty-icon">🧾</div><p>Sin movimientos aún.<br>Toca + para agregar.</p></div>
+      </div>
+    </div>
+
+    <!-- GRÁFICOS -->
+    <div class="page" id="p-charts">
+      <div class="page-header">
+        <h1>Análisis</h1>
+        <p>Cómo vas vs presupuesto</p>
+      </div>
+      <div class="grid2">
+        <div class="stat-card">
+          <div class="stat-val" id="c-avg-day">$0</div>
+          <div class="stat-lab">Gasto diario promedio</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="c-proj">$0</div>
+          <div class="stat-lab">Proyección al cierre</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="c-top-cat">—</div>
+          <div class="stat-lab">Mayor gasto</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="c-tx-count">0</div>
+          <div class="stat-lab">Movimientos</div>
+        </div>
+      </div>
+      <div class="sec-title">Gasto vs presupuesto</div>
+      <div class="card">
+        <canvas id="barChart" height="220"></canvas>
+      </div>
+      <div class="sec-title">Distribución del mes</div>
+      <div class="card" style="display:flex;align-items:center;gap:16px;">
+        <canvas id="donutChart" width="130" height="130" style="flex-shrink:0;"></canvas>
+        <div id="donut-legend" style="flex:1;font-size:12px;"></div>
+      </div>
+      <div class="sec-title">Cuotas fijas este período</div>
+      <div class="card" id="cuotas-card">
+        <p style="font-size:13px;color:var(--muted);">Sin cuotas configuradas.</p>
+      </div>
+    </div>
+
+    <!-- AJUSTES -->
+    <div class="page" id="p-settings">
+      <div class="page-header">
+        <h1>Configuración</h1>
+        <p>Presupuestos y cuotas</p>
+      </div>
+
+      <div class="sec-title">Meta mensual</div>
+      <div class="card">
+        <div class="setting-row">
+          <div><div class="setting-label">Facturación máxima</div><div class="setting-sub">Límite total del mes</div></div>
+          <div class="setting-val" id="s-meta" onclick="editMeta()">$800.000</div>
+        </div>
+      </div>
+
+      <div class="sec-title">Presupuesto rotativo por categoría</div>
+      <div class="card" id="budget-settings"></div>
+
+      <div class="sec-title">Cuotas fijas del período</div>
+      <div class="card">
+        <div id="cuotas-list"></div>
+        <button class="btn-secondary" onclick="openAddCuota()" style="margin-top:12px;">+ Agregar cuota</button>
+      </div>
+
+      <div class="sec-title">Datos</div>
+      <div class="card">
+        <div class="setting-row">
+          <div><div class="setting-label">Exportar datos</div><div class="setting-sub">Copiar JSON al portapapeles</div></div>
+          <button onclick="exportData()" style="background:var(--bg3);border:0.5px solid var(--border);border-radius:8px;padding:6px 12px;color:var(--text);font-size:13px;cursor:pointer;">Exportar</button>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">Limpiar mes</div><div class="setting-sub">Borrar movimientos del mes actual</div></div>
+          <button onclick="clearMonth()" style="background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.3);border-radius:8px;padding:6px 12px;color:#f87171;font-size:13px;cursor:pointer;">Limpiar</button>
+        </div>
+      </div>
+      <div style="height:20px;"></div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <button class="nav-btn active" onclick="showPage('home',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Inicio
+    </button>
+    <button class="nav-btn" onclick="showPage('gastos',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      Gastos
+    </button>
+    <button class="nav-btn" onclick="showPage('charts',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Análisis
+    </button>
+    <button class="nav-btn" onclick="showPage('settings',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Ajustes
+    </button>
+  </nav>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openAddGasto()" aria-label="Agregar gasto">+</button>
+
+<!-- MODAL GASTO -->
+<div class="modal-bg" id="modal-gasto">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>Nuevo cobro</h2>
+    <div class="form-group">
+      <label class="form-label">Monto ($)</label>
+      <input class="form-input" type="number" id="f-monto" placeholder="0" inputmode="numeric">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descripción</label>
+      <input class="form-input" type="text" id="f-desc" placeholder="ej: Uber Eats, Jumbo...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Fecha</label>
+      <input class="form-input" type="date" id="f-fecha">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Categoría</label>
+      <div class="cat-grid" id="cat-grid"></div>
+    </div>
+    <button class="btn-primary" onclick="saveGasto()">Guardar cobro</button>
+    <button class="btn-secondary" onclick="closeModal('modal-gasto')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL CUOTA -->
+<div class="modal-bg" id="modal-cuota">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>Agregar cuota fija</h2>
+    <div class="form-group">
+      <label class="form-label">Nombre</label>
+      <input class="form-input" type="text" id="cq-nombre" placeholder="ej: Scotiabank CAE">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Monto cuota ($)</label>
+      <input class="form-input" type="number" id="cq-monto" placeholder="0" inputmode="numeric">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cuota N° / Total (opcional)</label>
+      <div style="display:flex;gap:8px;">
+        <input class="form-input" type="number" id="cq-num" placeholder="ej: 2" style="flex:1" inputmode="numeric">
+        <input class="form-input" type="number" id="cq-tot" placeholder="ej: 3" style="flex:1" inputmode="numeric">
+      </div>
+    </div>
+    <button class="btn-primary" onclick="saveCuota()">Agregar cuota</button>
+    <button class="btn-secondary" onclick="closeModal('modal-cuota')">Cancelar</button>
+  </div>
+</div>
+
+<!-- MODAL PRESUPUESTO -->
+<div class="modal-bg" id="modal-budget">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2 id="mb-title">Editar presupuesto</h2>
+    <div class="form-group">
+      <label class="form-label">Presupuesto mensual ($)</label>
+      <input class="form-input" type="number" id="mb-val" placeholder="0" inputmode="numeric">
+    </div>
+    <input type="hidden" id="mb-cat">
+    <button class="btn-primary" onclick="saveBudget()">Guardar</button>
+    <button class="btn-secondary" onclick="closeModal('modal-budget')">Cancelar</button>
+  </div>
+</div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────────
+const CATS = [
+  { id:'comida',     label:'Comida',     icon:'🍽️',  color:'#22c55e', bg:'rgba(34,197,94,0.12)'  },
+  { id:'delivery',   label:'Delivery',   icon:'🛵',  color:'#f97316', bg:'rgba(249,115,22,0.12)' },
+  { id:'transporte', label:'Transporte', icon:'🚗',  color:'#f59e0b', bg:'rgba(245,158,11,0.12)' },
+  { id:'salud',      label:'Salud',      icon:'🏥',  color:'#06b6d4', bg:'rgba(6,182,212,0.12)'  },
+  { id:'mall',       label:'Mall/Ropa',  icon:'🛍️',  color:'#ec4899', bg:'rgba(236,72,153,0.12)' },
+  { id:'panoramas',  label:'Panoramas',  icon:'✈️',  color:'#a855f7', bg:'rgba(168,85,247,0.12)' },
+  { id:'fijo',       label:'Gasto fijo', icon:'🔒',  color:'#3b82f6', bg:'rgba(59,130,246,0.12)' },
+  { id:'otros',      label:'Otros',      icon:'📦',  color:'#6b7280', bg:'rgba(107,114,128,0.12)'},
 ];
-const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-const DEF_BUDGETS={comida:160000,delivery:45000,transporte:30000,salud:40000,mall:25000,panoramas:50000,fijo:123170,otros:20000};
-const DEF_CUOTAS=[
-  {id:'c1',nombre:'Scotiabank CAE',   monto:115167,num:null,tot:null},
-  {id:'c2',nombre:'TCOM (6/12)',       monto:31583, num:6,   tot:12},
-  {id:'c3',nombre:'H&M (2/3)',         monto:24805, num:2,   tot:3},
-  {id:'c4',nombre:'Comisión banco',    monto:8003,  num:null,tot:null},
-  {id:'c5',nombre:'Adidas (3/3)',      monto:20997, num:3,   tot:3},
-  {id:'c6',nombre:'Silkperfumess 3/3', monto:16397, num:3,   tot:3},
-  {id:'c7',nombre:'Trazosimple 3/3',   monto:9763,  num:3,   tot:3},
-];
 
-function ld(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}}
-function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
-function fmtK(n){if(Math.abs(n)>=1e6)return'$'+(n/1e6).toFixed(1)+'M';if(Math.abs(n)>=1000)return'$'+Math.round(n/1000)+'K';return'$'+Math.round(n).toLocaleString('es-CL')}
-function fmtFull(n){return'$'+Math.round(n).toLocaleString('es-CL')}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
+const DEFAULT_BUDGETS = {
+  comida:160000, delivery:45000, transporte:30000, salud:40000,
+  mall:25000, panoramas:50000, fijo:123170, otros:20000
+};
+const DEFAULT_META = 800000;
 
-// ── CLAUDE API ────────────────────────────────────────────────
-async function callClaude(userMsg, systemPrompt){
-  const res = await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:1000,
-      system: systemPrompt,
-      messages:[{role:'user',content:userMsg}]
-    })
-  });
-  const data = await res.json();
-  if(data.error) throw new Error(data.error.message);
-  return data.content.find(b=>b.type==='text')?.text || '';
+function load(key, def) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch(e){ return def; }
 }
+function save(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){} }
 
-const SYSTEM_EXTRACT = `Eres un extractor de gastos para una app de finanzas personales chilena.
-El usuario te enviará texto copiado de notificaciones de cobros bancarios, pantallazos, o listas de movimientos.
-Debes extraer TODOS los cobros o cargos y devolver ÚNICAMENTE un array JSON válido, sin texto adicional, sin backticks.
-
-Categorías disponibles: comida, delivery, transporte, salud, mall, panoramas, fijo, otros
-
-Reglas de categorización:
-- UBER EATS, PedidosYa, Rappi, delivery → delivery
-- UBER TRIP, taxi, metro, bip, bencina, copec, shell, parking → transporte
-- Supermercado (Lider, Jumbo, Tottus, Ekono) → comida
-- Restaurantes, cafés, snacks → comida
-- Farmacias, médicos, clínicas, ClassPass, gym → salud
-- Tiendas de ropa, mall, Falabella, Ripley, H&M, Adidas, Zara → mall
-- CAE, comisiones banco, cuotas de deuda → fijo
-- Viajes, pasajes, hoteles, actividades especiales → panoramas
-- Anything else → otros
-
-Formato de cada objeto:
-{"desc":"descripción limpia","monto":número_sin_puntos,"cat":"categoría","fecha":"YYYY-MM-DD"}
-
-Si no hay fecha clara usa hoy. Los montos son en pesos chilenos, sin puntos ni signos.
-RESPONDE SOLO EL ARRAY JSON. Ejemplo: [{"desc":"Uber Eats","monto":15000,"cat":"delivery","fecha":"2026-06-03"}]`;
-
-// ── STYLES ────────────────────────────────────────────────────
-const S = {
-  screen:{flex:1,overflowY:'auto',overflowX:'hidden',WebkitOverflowScrolling:'touch',paddingBottom:90},
-  nav:{position:'fixed',bottom:0,left:0,right:0,height:74,background:'rgba(10,10,15,0.95)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',borderTop:'0.5px solid rgba(255,255,255,0.07)',display:'flex',zIndex:100},
-  navBtn:(active)=>({flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:4,background:'none',border:'none',color:active?'#7c6aff':'#6b6b85',fontSize:10,fontFamily:'DM Sans,system-ui,sans-serif',cursor:'pointer',paddingTop:8}),
-  card:{background:'#13131a',border:'0.5px solid rgba(255,255,255,0.07)',borderRadius:16,padding:16,margin:'0 16px 12px'},
-  secTitle:{fontSize:11,color:'#6b6b85',textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:500,padding:'16px 20px 8px'},
-  hero:{margin:'0 16px 12px',background:'#13131a',border:'0.5px solid rgba(255,255,255,0.07)',borderRadius:20,padding:'24px 20px',position:'relative',overflow:'hidden'},
-  badge:(type)=>{const m={ok:{bg:'rgba(34,197,94,0.15)',c:'#4ade80'},warn:{bg:'rgba(245,158,11,0.15)',c:'#fbbf24'},over:{bg:'rgba(239,68,68,0.15)',c:'#f87171'},neutral:{bg:'rgba(255,255,255,0.07)',c:'#6b6b85'}};const t=m[type]||m.neutral;return{fontSize:10,fontWeight:600,padding:'2px 7px',borderRadius:99,background:t.bg,color:t.c}},
-  input:{width:'100%',background:'#1c1c26',border:'0.5px solid rgba(255,255,255,0.07)',borderRadius:12,padding:'13px 14px',color:'#f0f0f8',fontSize:16,fontFamily:'DM Sans,system-ui,sans-serif',outline:'none',WebkitAppearance:'none'},
-  btn:(variant='primary')=>({width:'100%',background:variant==='primary'?'#7c6aff':'#1c1c26',border:variant==='primary'?'none':'0.5px solid rgba(255,255,255,0.07)',borderRadius:14,padding:variant==='primary'?16:14,color:variant==='primary'?'white':'#6b6b85',fontSize:16,fontWeight:variant==='primary'?600:400,fontFamily:'DM Sans,system-ui,sans-serif',cursor:'pointer',marginTop:8}),
-  modalBg:{position:'fixed',inset:0,background:'rgba(0,0,0,0.7)',backdropFilter:'blur(8px)',WebkitBackdropFilter:'blur(8px)',zIndex:200,display:'flex',alignItems:'flex-end'},
-  modal:{background:'#13131a',borderRadius:'24px 24px 0 0',padding:'24px 20px 48px',width:'100%',maxHeight:'90vh',overflowY:'auto',borderTop:'0.5px solid rgba(255,255,255,0.07)'},
+let state = {
+  meta:     load('meta', DEFAULT_META),
+  budgets:  load('budgets', {...DEFAULT_BUDGETS}),
+  cuotas:   load('cuotas', [
+    {id:'c1', nombre:'Scotiabank CAE',    monto:115167, num:null, tot:null},
+    {id:'c2', nombre:'TCOM (6/12)',       monto:31583,  num:6,    tot:12},
+    {id:'c3', nombre:'H&M (2/3)',         monto:24805,  num:2,    tot:3},
+    {id:'c4', nombre:'Comisión banco',    monto:8003,   num:null, tot:null},
+    {id:'c5', nombre:'Adidas (3/3)',      monto:20997,  num:3,    tot:3},
+    {id:'c6', nombre:'Silkperfumess (3/3)',monto:16397, num:3,    tot:3},
+    {id:'c7', nombre:'Trazosimple (3/3)', monto:9763,   num:3,    tot:3},
+  ]),
+  txs:      load('txs', []),
+  viewMonth: new Date().getMonth(),
+  viewYear:  new Date().getFullYear(),
+  selCat:   'comida',
 };
 
-// ── COMPONENTS ────────────────────────────────────────────────
-function ProgressBar({pct,h=6}){
-  const color=pct>=100?'#ef4444':pct>=80?'#f59e0b':'#7c6aff';
-  return React.createElement('div',{style:{background:'#1c1c26',borderRadius:99,height:h,overflow:'hidden'}},
-    React.createElement('div',{style:{height:'100%',borderRadius:99,background:color,width:Math.min(100,pct)+'%',transition:'width 0.5s ease'}}));
+// ── MONTH HELPERS ────────────────────────────────────────────
+const MONTHS = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function changeMonth(d) {
+  state.viewMonth += d;
+  if (state.viewMonth < 0)  { state.viewMonth = 11; state.viewYear--; }
+  if (state.viewMonth > 11) { state.viewMonth = 0;  state.viewYear++; }
+  render();
 }
 
-function NavIcon({page}){
-  const icons={
-    home:<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
-    gastos:<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>,
-    import:<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
-    charts:<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>,
-    settings:<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>,
-  };
-  return icons[page]||null;
+function getMonthTxs() {
+  return state.txs.filter(t => {
+    const d = new Date(t.fecha + 'T12:00:00');
+    return d.getMonth() === state.viewMonth && d.getFullYear() === state.viewYear;
+  });
 }
 
-// ── MAIN APP ──────────────────────────────────────────────────
-function App(){
-  const today=new Date();
-  const[tab,setTab]=useState('home');
-  const[txs,setTxs]=useState(()=>ld('txs2',[]));
-  const[budgets,setBudgets]=useState(()=>ld('budgets2',{...DEF_BUDGETS}));
-  const[cuotas,setCuotas]=useState(()=>ld('cuotas2',[...DEF_CUOTAS]));
-  const[meta,setMeta]=useState(()=>ld('meta2',800000));
-  const[viewMonth,setViewMonth]=useState(today.getMonth());
-  const[viewYear,setViewYear]=useState(today.getFullYear());
-  // Add gasto modal
-  const[addOpen,setAddOpen]=useState(false);
-  const[fMonto,setFMonto]=useState('');
-  const[fDesc,setFDesc]=useState('');
-  const[fFecha,setFFecha]=useState(today.toISOString().slice(0,10));
-  const[fCat,setFCat]=useState('comida');
-  // Cuota add
-  const[cuotaOpen,setCuotaOpen]=useState(false);
-  const[cqNombre,setCqNombre]=useState('');
-  const[cqMonto,setCqMonto]=useState('');
-  const[cqNum,setCqNum]=useState('');
-  const[cqTot,setCqTot]=useState('');
+function fmtCLP(n) {
+  if (Math.abs(n) >= 1000000) return '$' + (n/1000000).toFixed(1) + 'M';
+  if (Math.abs(n) >= 1000)    return '$' + Math.round(n/1000) + 'K';
+  return '$' + Math.round(n).toLocaleString('es-CL');
+}
+function fmtFull(n) { return '$' + Math.round(n).toLocaleString('es-CL'); }
 
-  // Persist
-  useEffect(()=>sv('txs2',txs),[txs]);
-  useEffect(()=>sv('budgets2',budgets),[budgets]);
-  useEffect(()=>sv('cuotas2',cuotas),[cuotas]);
-  useEffect(()=>sv('meta2',meta),[meta]);
+// ── RENDER ───────────────────────────────────────────────────
+function render() {
+  const txs = getMonthTxs();
+  const cuotasTotal = state.cuotas.reduce((s,c) => s+c.monto, 0);
+  const rotTotal    = txs.reduce((s,t) => s+t.monto, 0);
+  const total       = rotTotal + cuotasTotal;
+  const pct         = Math.min(100, (total / state.meta) * 100);
+  const resta       = state.meta - total;
 
-  // Derived
-  const monthTxs=txs.filter(t=>{const d=new Date(t.fecha+'T12:00:00');return d.getMonth()===viewMonth&&d.getFullYear()===viewYear});
-  const cuotasTotal=cuotas.reduce((s,c)=>s+c.monto,0);
-  const rotTotal=monthTxs.reduce((s,t)=>s+t.monto,0);
-  const grandTotal=rotTotal+cuotasTotal;
-  const pct=Math.min(110,grandTotal/meta*100);
-  const resta=meta-grandTotal;
-  const isCurrentMonth=viewMonth===today.getMonth()&&viewYear===today.getFullYear();
-  const cycleDay=today.getDate();
-  const daysPassed=isCurrentMonth?Math.max(1,cycleDay):30;
-  const daysLeft=isCurrentMonth?Math.max(0,22-cycleDay):0;
-  const spentByCat={};
-  monthTxs.forEach(t=>{spentByCat[t.cat]=(spentByCat[t.cat]||0)+t.monto});
+  // Days
+  const today   = new Date();
+  const isCurrentMonth = (state.viewMonth === today.getMonth() && state.viewYear === today.getFullYear());
+  const daysLeft = isCurrentMonth ? Math.max(0, 22 - today.getDate()) : 0;
+  const daysPassed = isCurrentMonth ? Math.max(1, today.getDate() - 22 < 0 ? today.getDate() : 22) : 30;
 
-  function changeMonth(d){
-    setViewMonth(m=>{let nm=m+d,ny=viewYear;if(nm<0){nm=11;ny--}if(nm>11){nm=0;ny++}setViewYear(ny);return nm});
-  }
+  // Header
+  document.getElementById('month-display').textContent = MONTHS[state.viewMonth] + ' ' + state.viewYear;
+  document.getElementById('h-total-val').textContent = Math.round(total).toLocaleString('es-CL');
+  document.getElementById('h-meta-disp').textContent = fmtFull(state.meta);
+  document.getElementById('h-days-left').textContent = isCurrentMonth ? daysLeft + ' días al cierre' : 'Mes cerrado';
+  document.getElementById('h-rot').textContent    = fmtCLP(rotTotal);
+  document.getElementById('h-cuotas').textContent = fmtCLP(cuotasTotal);
+  document.getElementById('h-resta').textContent  = fmtCLP(resta);
+  document.getElementById('h-resta').style.color  = resta < 0 ? 'var(--red)' : 'var(--accent2)';
 
-  // ── IMPORT via Claude ──────────────────────────────────────
-  function addTxs(newTxs){
-    setTxs(prev=>[...prev,...newTxs]);
-  }
+  const hprog = document.getElementById('h-prog');
+  hprog.style.width = pct + '%';
+  hprog.className = 'progress-fill ' + (pct >= 100 ? 'prog-red' : pct >= 80 ? 'prog-amber' : 'prog-accent');
 
-  // ── RENDER PAGES ──────────────────────────────────────────
-  const pages={
-    home:<HomePage monthTxs={monthTxs} cuotasTotal={cuotasTotal} rotTotal={rotTotal} grandTotal={grandTotal} pct={pct} resta={resta} meta={meta} daysLeft={daysLeft} viewMonth={viewMonth} viewYear={viewYear} changeMonth={changeMonth} budgets={budgets} spentByCat={spentByCat} isCurrentMonth={isCurrentMonth}/>,
-    gastos:<GastosPage monthTxs={monthTxs} deleteTx={deleteTx} viewMonth={viewMonth} viewYear={viewYear}/>,
-    import:<ImportPage addTxs={addTxs}/>,
-    charts:<ChartsPage monthTxs={monthTxs} rotTotal={rotTotal} cuotasTotal={cuotasTotal} grandTotal={grandTotal} meta={meta} daysPassed={daysPassed} daysLeft={daysLeft} budgets={budgets} spentByCat={spentByCat} cuotas={cuotas} isCurrentMonth={isCurrentMonth}/>,
-    settings:<SettingsPage budgets={budgets} setBudgets={setBudgets} meta={meta} setMeta={setMeta} cuotas={cuotas} deleteCuota={deleteCuota} cqNombre={cqNombre} setCqNombre={setCqNombre} cqMonto={cqMonto} setCqMonto={setCqMonto} cqNum={cqNum} setCqNum={setCqNum} cqTot={cqTot} setCqTot={setCqTot} cuotaOpen={cuotaOpen} setCuotaOpen={setCuotaOpen} saveCuota={saveCuota} setTxs={setTxs}/>,
-  };
-  function saveGasto(){
-    const m2=parseFloat(fMonto);
-    if(!m2||m2<=0||!fDesc.trim()||!fFecha){alert('Completa todos los campos');return}
-    setTxs(prev=>[...prev,{id:uid(),monto:m2,desc:fDesc.trim(),fecha:fFecha,cat:fCat}]);
-    setAddOpen(false);setFMonto('');setFDesc('');
-  }
+  // Alerts
+  renderAlerts(pct, txs, rotTotal, daysPassed, daysLeft);
 
-  function deleteTx(id){setTxs(prev=>prev.filter(t=>t.id!==id))}
-  function deleteCuota(id){setCuotas(prev=>prev.filter(c=>c.id!==id))}
+  // Budget rows
+  renderBudgetRows(txs);
 
-  function saveCuota(){
-    if(!cqNombre||!cqMonto){alert('Nombre y monto son obligatorios');return}
-    setCuotas(prev=>[...prev,{id:uid(),nombre:cqNombre,monto:parseFloat(cqMonto),num:parseInt(cqNum)||null,tot:parseInt(cqTot)||null}]);
-    setCuotaOpen(false);setCqNombre('');setCqMonto('');setCqNum('');setCqTot('');
-  }
+  // Recent txs
+  renderRecentTxs(txs);
 
-  return React.createElement(React.Fragment,null,
-    React.createElement('div',{style:S.screen},pages[tab]),
-    // FAB
-    tab!=='import'&&React.createElement('button',{onClick:()=>setAddOpen(true),style:{position:'fixed',bottom:90,right:20,width:54,height:54,borderRadius:'50%',background:'#7c6aff',border:'none',color:'white',fontSize:26,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',boxShadow:'0 4px 20px rgba(124,106,255,0.4)',zIndex:99}},' + '),
-    // NAV
-    React.createElement('nav',{style:S.nav},
-      ['home','gastos','import','charts','settings'].map(p=>
-        React.createElement('button',{key:p,style:S.navBtn(tab===p),onClick:()=>setTab(p)},
-          React.createElement(NavIcon,{page:p}),
-          {home:'Inicio',gastos:'Gastos',import:'Importar',charts:'Análisis',settings:'Ajustes'}[p]
-        )
-      )
-    ),
-    // ADD MODAL
-    addOpen&&React.createElement('div',{style:S.modalBg,onClick:e=>{if(e.target===e.currentTarget)setAddOpen(false)}},
-      React.createElement('div',{style:S.modal},
-        React.createElement('div',{style:{width:36,height:4,background:'rgba(255,255,255,0.1)',borderRadius:99,margin:'0 auto 20px'}}),
-        React.createElement('h2',{style:{fontSize:18,fontWeight:600,marginBottom:20}},'Nuevo cobro'),
-        React.createElement('div',{style:{marginBottom:16}},
-          React.createElement('label',{style:{fontSize:12,color:'#6b6b85',marginBottom:6,display:'block',fontWeight:500,textTransform:'uppercase',letterSpacing:'0.05em'}},'Monto ($)'),
-          React.createElement('input',{style:S.input,type:'number',placeholder:'0',inputMode:'numeric',value:fMonto,onChange:e=>setFMonto(e.target.value)})
-        ),
-        React.createElement('div',{style:{marginBottom:16}},
-          React.createElement('label',{style:{fontSize:12,color:'#6b6b85',marginBottom:6,display:'block',fontWeight:500,textTransform:'uppercase',letterSpacing:'0.05em'}},'Descripción'),
-          React.createElement('input',{style:S.input,type:'text',placeholder:'ej: Uber Eats, Jumbo...',value:fDesc,onChange:e=>setFDesc(e.target.value)})
-        ),
-        React.createElement('div',{style:{marginBottom:16}},
-          React.createElement('label',{style:{fontSize:12,color:'#6b6b85',marginBottom:6,display:'block',fontWeight:500,textTransform:'uppercase',letterSpacing:'0.05em'}},'Fecha'),
-          React.createElement('input',{style:S.input,type:'date',value:fFecha,onChange:e=>setFFecha(e.target.value)})
-        ),
-        React.createElement('div',{style:{marginBottom:16}},
-          React.createElement('label',{style:{fontSize:12,color:'#6b6b85',marginBottom:6,display:'block',fontWeight:500,textTransform:'uppercase',letterSpacing:'0.05em'}},'Categoría'),
-          React.createElement('div',{style:{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}},
-            CATS.map(c=>React.createElement('div',{key:c.id,onClick:()=>setFCat(c.id),style:{background:fCat===c.id?'rgba(124,106,255,0.15)':'#1c1c26',border:`0.5px solid ${fCat===c.id?'#7c6aff':'rgba(255,255,255,0.07)'}`,borderRadius:10,padding:'10px 6px',textAlign:'center',cursor:'pointer',fontSize:11,color:fCat===c.id?'#7c6aff':'#6b6b85'}},
-              React.createElement('span',{style:{fontSize:20,display:'block',marginBottom:4}},c.icon),c.label
-            ))
-          )
-        ),
-        React.createElement('button',{style:S.btn('primary'),onClick:saveGasto},'Guardar cobro'),
-        React.createElement('button',{style:S.btn('secondary'),onClick:()=>setAddOpen(false)},'Cancelar')
-      )
-    )
-  );
+  // All txs
+  renderAllTxs(txs);
+
+  // Charts
+  renderCharts(txs, rotTotal, daysPassed, daysLeft);
+
+  // Settings
+  renderSettings();
+
+  // Stats
+  document.getElementById('s-meta').textContent = fmtFull(state.meta);
 }
 
-// ── HOME PAGE ─────────────────────────────────────────────────
-function HomePage({monthTxs,cuotasTotal,rotTotal,grandTotal,pct,resta,meta,daysLeft,viewMonth,viewYear,changeMonth,budgets,spentByCat,isCurrentMonth}){
-  const sorted=[...monthTxs].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha)).slice(0,5);
-  return React.createElement('div',null,
-    React.createElement('div',{style:{padding:'52px 20px 16px',background:'linear-gradient(180deg,rgba(124,106,255,0.06) 0%,transparent 100%)'}},
-      React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:4}},
-        React.createElement('button',{onClick:()=>changeMonth(-1),style:{background:'none',border:'none',color:'#6b6b85',fontSize:22,cursor:'pointer',padding:'4px 8px'}},'‹'),
-        React.createElement('span',{style:{fontSize:15,fontWeight:500}},MONTHS[viewMonth]+' '+viewYear),
-        React.createElement('button',{onClick:()=>changeMonth(1),style:{background:'none',border:'none',color:'#6b6b85',fontSize:22,cursor:'pointer',padding:'4px 8px'}},'›')
-      )
-    ),
-    // Hero
-    React.createElement('div',{style:S.hero},
-      React.createElement('div',{style:{fontSize:11,color:'#6b6b85',textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:500}},'Facturación estimada'),
-      React.createElement('div',{style:{fontSize:40,fontWeight:300,letterSpacing:-2,margin:'6px 0 2px',fontFamily:'DM Mono,monospace'}},
-        React.createElement('span',{style:{fontSize:20,color:'#6b6b85',marginRight:2}},'$'),
-        Math.round(grandTotal).toLocaleString('es-CL')
-      ),
-      React.createElement('div',{style:{fontSize:12,color:'#6b6b85'}},
-        'Meta: ',React.createElement('strong',null,fmtFull(meta)),' · ',
-        isCurrentMonth?`${daysLeft} días al cierre`:'Mes cerrado'
-      ),
-      React.createElement('div',{style:{marginTop:14}},React.createElement(ProgressBar,{pct,h:8})),
-      React.createElement('div',{style:{display:'flex',gap:16,marginTop:18}},
-        [{val:fmtK(rotTotal),lab:'Rotativo'},{val:fmtK(cuotasTotal),lab:'Cuotas'},{val:fmtK(resta),lab:'Disponible',color:resta<0?'#ef4444':'#5eead4'}].map((s,i)=>
-          React.createElement('div',{key:i,style:{flex:1}},
-            React.createElement('div',{style:{fontSize:18,fontWeight:500,fontFamily:'DM Mono,monospace',color:s.color||'#f0f0f8'}},s.val),
-            React.createElement('div',{style:{fontSize:10,color:'#6b6b85',marginTop:2}},s.lab)
-          )
-        )
-      )
-    ),
-    // Alerts
-    pct>=100&&React.createElement('div',{style:{margin:'0 16px 12px',padding:'12px 14px',borderRadius:12,background:'rgba(239,68,68,0.1)',border:'0.5px solid rgba(239,68,68,0.3)',display:'flex',gap:10}},
-      React.createElement('span',{style:{fontSize:18}},'🚨'),
-      React.createElement('div',{style:{fontSize:12,lineHeight:1.5}},React.createElement('strong',null,'Facturación superó la meta.'),' Llevas ',fmtFull(grandTotal),' de ',fmtFull(meta),'.')
-    ),
-    pct>=80&&pct<100&&React.createElement('div',{style:{margin:'0 16px 12px',padding:'12px 14px',borderRadius:12,background:'rgba(245,158,11,0.1)',border:'0.5px solid rgba(245,158,11,0.3)',display:'flex',gap:10}},
-      React.createElement('span',{style:{fontSize:18}},'⚠️'),
-      React.createElement('div',{style:{fontSize:12,lineHeight:1.5}},React.createElement('strong',null,`Al ${Math.round(pct)}% de la meta.`),' Quedan ',fmtFull(resta),' disponibles.')
-    ),
-    pct<60&&monthTxs.length>0&&React.createElement('div',{style:{margin:'0 16px 12px',padding:'12px 14px',borderRadius:12,background:'rgba(34,197,94,0.1)',border:'0.5px solid rgba(34,197,94,0.3)',display:'flex',gap:10}},
-      React.createElement('span',{style:{fontSize:18}},'✅'),
-      React.createElement('div',{style:{fontSize:12,lineHeight:1.5}},React.createElement('strong',null,'Vas bien.'),' Llevas el ',Math.round(pct),'% de la meta.')
-    ),
-    // Budget rows
-    React.createElement('div',{style:{fontSize:11,color:'#6b6b85',textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:500,padding:'16px 20px 8px'}},'Presupuesto por categoría'),
-    React.createElement('div',{style:S.card},
-      CATS.map(cat=>{
-        const spent=spentByCat[cat.id]||0;
-        const budget=budgets[cat.id]||0;
-        const cpct=budget>0?Math.min(100,spent/budget*100):0;
-        const pillType=cpct>=100?'over':cpct>=75?'warn':'ok';
-        return React.createElement('div',{key:cat.id,style:{display:'flex',alignItems:'center',gap:12,padding:'12px 0',borderBottom:'0.5px solid rgba(255,255,255,0.07)'}},
-          React.createElement('div',{style:{width:36,height:36,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',fontSize:18,flexShrink:0,background:cat.bg}},cat.icon),
-          React.createElement('div',{style:{flex:1,minWidth:0}},
-            React.createElement('div',{style:{fontSize:13,fontWeight:500}},cat.label),
-            React.createElement(ProgressBar,{pct:cpct,h:5}),
-            React.createElement('div',{style:{fontSize:11,color:'#6b6b85',marginTop:3}},
-              fmtK(spent),' de ',fmtK(budget),' · resta ',
-              React.createElement('strong',{style:{color:(budget-spent)<0?'#f87171':'#4ade80'}},fmtK(budget-spent))
-            )
-          ),
-          React.createElement('span',{style:S.badge(pillType)},cpct>=100?'Excedido':Math.round(cpct)+'%')
-        )
-      })
-    ),
-    // Recent
-    React.createElement('div',{style:{fontSize:11,color:'#6b6b85',textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:500,padding:'16px 20px 8px'}},'Últimos movimientos'),
-    React.createElement('div',{style:S.card},
-      sorted.length===0
-        ?React.createElement('div',{style:{textAlign:'center',padding:'32px 16px',color:'#6b6b85'}},
-            React.createElement('div',{style:{fontSize:36,marginBottom:8}},'🧾'),
-            React.createElement('p',{style:{fontSize:13}},'Sin movimientos. Toca + o usa Importar.')
-          )
-        :sorted.map(t=>React.createElement(TxRow,{key:t.id,tx:t}))
-    )
-  );
-}
+function renderAlerts(pct, txs, rotTotal, daysPassed, daysLeft) {
+  const cont = document.getElementById('alerts-container');
+  cont.innerHTML = '';
 
-function TxRow({tx,onDelete}){
-  const cat=CATS.find(c=>c.id===tx.cat)||CATS[7];
-  const d=new Date(tx.fecha+'T12:00:00');
-  const ds=d.getDate()+' '+MONTHS[d.getMonth()].slice(0,3);
-  return React.createElement('div',{style:{display:'flex',alignItems:'center',gap:12,padding:'11px 0',borderBottom:'0.5px solid rgba(255,255,255,0.07)'}},
-    React.createElement('div',{style:{width:36,height:36,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',fontSize:17,flexShrink:0,background:cat.bg}},cat.icon),
-    React.createElement('div',{style:{flex:1,minWidth:0}},
-      React.createElement('div',{style:{fontSize:13,fontWeight:500,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},tx.desc),
-      React.createElement('div',{style:{fontSize:11,color:'#6b6b85',marginTop:1}},cat.label+' · '+ds)
-    ),
-    React.createElement('div',{style:{display:'flex',alignItems:'center',gap:6}},
-      React.createElement('div',{style:{fontSize:14,fontWeight:600,fontFamily:'DM Mono,monospace',color:'#ef4444'}},'-'+fmtK(tx.monto)),
-      onDelete&&React.createElement('button',{onClick:()=>onDelete(tx.id),style:{background:'none',border:'none',color:'#6b6b85',fontSize:18,cursor:'pointer',padding:'4px 6px'}},'×')
-    )
-  );
-}
-
-// ── GASTOS PAGE ───────────────────────────────────────────────
-function GastosPage({monthTxs,deleteTx,viewMonth,viewYear}){
-  const sorted=[...monthTxs].sort((a,b)=>new Date(b.fecha)-new Date(a.fecha));
-  return React.createElement('div',null,
-    React.createElement('div',{style:{padding:'52px 20px 16px'}},
-      React.createElement('h1',{style:{fontSize:26,fontWeight:600,letterSpacing:-0.5}},'Movimientos'),
-      React.createElement('p',{style:{fontSize:13,color:'#6b6b85',marginTop:4}},sorted.length+' movimientos en '+MONTHS[viewMonth])
-    ),
-    React.createElement('div',{style:S.card},
-      sorted.length===0
-        ?React.createElement('div',{style:{textAlign:'center',padding:'32px 16px',color:'#6b6b85'}},
-            React.createElement('div',{style:{fontSize:36,marginBottom:8}},'🧾'),
-            React.createElement('p',{style:{fontSize:13}},'Sin movimientos aún.')
-          )
-        :sorted.map(t=>React.createElement(TxRow,{key:t.id,tx:t,onDelete:deleteTx}))
-    )
-  );
-}
-
-// ── IMPORT PAGE ───────────────────────────────────────────────
-function ImportPage({addTxs}){
-  const[mode,setMode]=useState('json'); // 'json' | 'text'
-  const[jsonText,setJsonText]=useState('');
-  const[freeText,setFreeText]=useState('');
-  const[parsed,setParsed]=useState(null);
-  const[error,setError]=useState('');
-  const[success,setSuccess]=useState('');
-
-  // ── JSON IMPORT ──────────────────────────────────────────
-  function parseJSON(){
-    setError('');setParsed(null);setSuccess('');
-    const txt=jsonText.trim();
-    if(!txt){setError('Pega el JSON que te dio el coach primero.');return}
-    try{
-      let arr=JSON.parse(txt);
-      if(!Array.isArray(arr))arr=[arr];
-      const valid=arr.filter(t=>t.monto>0).map(t=>({
-        id:uid(),
-        desc:t.desc||t.descripcion||'Sin descripción',
-        monto:Number(t.monto)||0,
-        cat:t.cat||t.categoria||'otros',
-        fecha:t.fecha||new Date().toISOString().slice(0,10)
-      }));
-      if(!valid.length){setError('No encontré cobros válidos en el JSON.');return}
-      setParsed(valid);
-    }catch(e){setError('El JSON no es válido. Cópialo completo desde el chat, incluyendo los corchetes [ ].');}
+  if (pct >= 100) {
+    cont.innerHTML += `<div class="alert-banner alert-danger"><span class="alert-icon">🚨</span><div class="alert-text"><strong>Facturación superó la meta.</strong> Ya llevas ${fmtFull(rotTotal + state.cuotas.reduce((s,c)=>s+c.monto,0))} de ${fmtFull(state.meta)}.</div></div>`;
+  } else if (pct >= 80) {
+    const meta = state.meta, total2 = rotTotal + state.cuotas.reduce((s,c)=>s+c.monto,0);
+    cont.innerHTML += `<div class="alert-banner alert-warn"><span class="alert-icon">⚠️</span><div class="alert-text"><strong>Cerca del límite.</strong> Llevas el ${Math.round(pct)}% de la meta. Quedan ${fmtFull(meta-total2)} disponibles.</div></div>`;
   }
 
-  // ── TEXT PARSE (sin API) ─────────────────────────────────
-  // Reglas simples de categorización local
-  const CAT_RULES=[
-    {pat:/uber\s*eats|pedidosya|rappi|delivery|krispykreme|melt\s*pizza|domino|pizza/i,   cat:'delivery'},
-    {pat:/uber\s*trip|taxi|cabify|metro|bip|red\s*movilidad|copec|shell|bencin|combustib|parking|estacion/i, cat:'transporte'},
-    {pat:/jumbo|lider|l[ií]der|tottus|ekono|santa\s*isabel|unimarc|carnicer|feria|verdur/i,cat:'comida'},
-    {pat:/farmacia|cruz\s*verde|ahumada|salcobrand|m[eé]dico|cl[ií]nica|laboratorio|classpass|gym|fitness/i,cat:'salud'},
-    {pat:/falabella|ripley|h&m|zara|adidas|nike|paris|corona|mall|ropa|tienda/i,           cat:'mall'},
-    {pat:/cae|comisi[oó]n|banco|cuota|cr[eé]dito|servicio.*actividad/i,                   cat:'fijo'},
-    {pat:/latam|hotel|airbnb|booking|pasaje|viaje|fogo|aniversario/i,                     cat:'panoramas'},
-    {pat:/restaurant|sushi|nikkei|almuerzo|caf[eé]|spid|apoquindo|mc\s*donald|burger|bar/i,cat:'comida'},
-  ];
-  function guessCat(desc){
-    for(const r of CAT_RULES)if(r.pat.test(desc))return r.cat;
-    return'otros';
+  // Delivery check
+  const deliveryCat = txs.filter(t=>t.cat==='delivery').reduce((s,t)=>s+t.monto,0);
+  const delivBudget = state.budgets.delivery;
+  const delivPct = delivBudget > 0 ? deliveryCat/delivBudget : 0;
+  if (delivPct > 0.75 && delivPct < 1) {
+    cont.innerHTML += `<div class="alert-banner alert-warn"><span class="alert-icon">🛵</span><div class="alert-text"><strong>Delivery al ${Math.round(delivPct*100)}%.</strong> Te quedan ${fmtFull(delivBudget-deliveryCat)} en delivery este mes.</div></div>`;
+  } else if (delivPct >= 1) {
+    cont.innerHTML += `<div class="alert-banner alert-danger"><span class="alert-icon">🛵</span><div class="alert-text"><strong>Delivery excedido.</strong> Superaste el presupuesto en ${fmtFull(deliveryCat-delivBudget)}.</div></div>`;
   }
-  function parseText(){
-    setError('');setParsed(null);setSuccess('');
-    const txt=freeText.trim();
-    if(!txt){setError('Escribe o pega el texto del cobro primero.');return}
-    const today=new Date().toISOString().slice(0,10);
-    const results=[];
-    // Try to find amount + description patterns
-    // Pattern 1: "Compra de $X.XXX en COMERCIO"
-    const p1=/(?:compra|cargo|cobro|pago|transacci[oó]n)[^$\d]*\$?\s*([\d\.]+)\s*(?:en|en\s+)([^\n\r$]+)/gi;
-    // Pattern 2: "COMERCIO $X.XXX" or "COMERCIO: $X.XXX"
-    const p2=/([A-Z][A-Z\s\*]+?)\s*[\:\-]?\s*\$\s*([\d\.]+)/g;
-    // Pattern 3: "$X.XXX en COMERCIO" or "$X.XXX - COMERCIO"
-    const p3=/\$\s*([\d\.]+)\s*(?:en|[-–])\s*([^\n\r$,]+)/gi;
-    // Pattern 4: simple "monto descripcion" per line
-    const lines=txt.split(/[\n\r]+/).filter(l=>l.trim());
 
-    let found=false;
-    for(const line of lines){
-      const l=line.trim();
-      // Try p1
-      let m;
-      const rp1=new RegExp(p1.source,'gi');
-      while((m=rp1.exec(l))!==null){
-        const monto=parseFloat(m[1].replace(/\./g,''));
-        const desc=m[2].trim().replace(/\s+/g,' ').slice(0,60);
-        if(monto>0&&desc){results.push({id:uid(),monto,desc,cat:guessCat(desc),fecha:today});found=true}
-      }
-      if(found)continue;
-      // Try p3
-      const rp3=new RegExp(p3.source,'gi');
-      while((m=rp3.exec(l))!==null){
-        const monto=parseFloat(m[1].replace(/\./g,''));
-        const desc=m[2].trim().replace(/\s+/g,' ').slice(0,60);
-        if(monto>0&&desc){results.push({id:uid(),monto,desc,cat:guessCat(desc),fecha:today});found=true}
-      }
-      if(found)continue;
-      // Try p2
-      const rp2=new RegExp(p2.source,'g');
-      while((m=rp2.exec(l))!==null){
-        const monto=parseFloat(m[2].replace(/\./g,''));
-        const desc=m[1].trim().replace(/\s+/g,' ').slice(0,60);
-        if(monto>100&&desc.length>2){results.push({id:uid(),monto,desc,cat:guessCat(desc),fecha:today});found=true}
+  if (pct < 60 && txs.length > 0) {
+    cont.innerHTML += `<div class="alert-banner alert-ok"><span class="alert-icon">✅</span><div class="alert-text"><strong>Vas bien.</strong> Llevas el ${Math.round(pct)}% de la meta. Sigues en rango para cerrar bajo ${fmtFull(state.meta)}.</div></div>`;
+  }
+}
+
+function renderBudgetRows(txs) {
+  const cont = document.getElementById('budget-rows');
+  const spentByCat = {};
+  txs.forEach(t => { spentByCat[t.cat] = (spentByCat[t.cat]||0) + t.monto; });
+
+  cont.innerHTML = CATS.map(cat => {
+    const spent  = spentByCat[cat.id] || 0;
+    const budget = state.budgets[cat.id] || 0;
+    const pct    = budget > 0 ? Math.min(100, (spent/budget)*100) : 0;
+    const resta  = budget - spent;
+    const progCls = pct >= 100 ? 'prog-red' : pct >= 80 ? 'prog-amber' : 'prog-green';
+    const pillCls = pct >= 100 ? 'pill-over' : pct >= 75 ? 'pill-warn' : 'pill-ok';
+    const pillTxt = pct >= 100 ? 'Excedido' : Math.round(pct)+'%';
+
+    return `<div class="budget-row">
+      <div class="bcat-icon" style="background:${cat.bg}">${cat.icon}</div>
+      <div class="bcat-info">
+        <div class="bcat-name">${cat.label}</div>
+        <div class="progress-wrap" style="margin-top:6px;width:100%;"><div class="progress-fill ${progCls}" style="width:${pct}%"></div></div>
+        <div class="bcat-detail" style="margin-top:4px;">${fmtCLP(spent)} de ${fmtCLP(budget)} · resta <strong style="color:${resta<0?'#f87171':'#4ade80'}">${fmtCLP(resta)}</strong></div>
+      </div>
+      <div class="bcat-amounts">
+        <span class="badge-pill ${pillCls}">${pillTxt}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderRecentTxs(txs) {
+  const cont = document.getElementById('recent-txs');
+  const sorted = [...txs].sort((a,b) => new Date(b.fecha) - new Date(a.fecha)).slice(0,5);
+  if (!sorted.length) {
+    cont.innerHTML = '<div class="empty"><div class="empty-icon">🧾</div><p>Sin movimientos aún.<br>Toca + para agregar un cobro.</p></div>';
+    return;
+  }
+  cont.innerHTML = sorted.map(t => txRow(t)).join('');
+}
+
+function renderAllTxs(txs) {
+  const cont = document.getElementById('all-txs');
+  const lbl  = document.getElementById('tx-count-label');
+  lbl.textContent = txs.length + ' movimientos este mes';
+  if (!txs.length) {
+    cont.innerHTML = '<div class="empty"><div class="empty-icon">🧾</div><p>Sin movimientos aún.</p></div>';
+    return;
+  }
+  const sorted = [...txs].sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+  cont.innerHTML = sorted.map(t => txRow(t, true)).join('');
+}
+
+function txRow(t, withDel=false) {
+  const cat = CATS.find(c=>c.id===t.cat) || CATS[7];
+  const d   = new Date(t.fecha + 'T12:00:00');
+  const ds  = d.getDate() + ' ' + MONTHS[d.getMonth()].slice(0,3);
+  return `<div class="tx-row">
+    <div class="tx-icon" style="background:${cat.bg}">${cat.icon}</div>
+    <div class="tx-info">
+      <div class="tx-desc">${t.desc}</div>
+      <div class="tx-meta">${cat.label} · ${ds}</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;">
+      <div class="tx-amount">-${fmtCLP(t.monto)}</div>
+      ${withDel ? `<button class="del-btn" onclick="deleteTx('${t.id}')">×</button>` : ''}
+    </div>
+  </div>`;
+}
+
+function renderCharts(txs, rotTotal, daysPassed, daysLeft) {
+  // Stats
+  const avgDay = daysPassed > 0 ? rotTotal/daysPassed : 0;
+  const proj   = rotTotal + avgDay * daysLeft + state.cuotas.reduce((s,c)=>s+c.monto,0);
+  const spentByCat = {};
+  txs.forEach(t => { spentByCat[t.cat]=(spentByCat[t.cat]||0)+t.monto; });
+  const topCat = CATS.reduce((best,c) => (spentByCat[c.id]||0)>(spentByCat[best.id]||0)?c:best, CATS[0]);
+
+  document.getElementById('c-avg-day').textContent = fmtCLP(avgDay);
+  document.getElementById('c-proj').textContent    = fmtCLP(proj);
+  document.getElementById('c-proj').style.color    = proj > state.meta ? 'var(--red)' : 'var(--green)';
+  document.getElementById('c-top-cat').textContent = topCat.icon + ' ' + topCat.label;
+  document.getElementById('c-tx-count').textContent = txs.length;
+
+  // Bar chart
+  drawBarChart(spentByCat);
+
+  // Donut
+  drawDonut(spentByCat);
+
+  // Cuotas
+  const cuotasCont = document.getElementById('cuotas-card');
+  if (!state.cuotas.length) {
+    cuotasCont.innerHTML = '<p style="font-size:13px;color:var(--muted);">Sin cuotas configuradas.</p>';
+  } else {
+    cuotasCont.innerHTML = state.cuotas.map(c => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid var(--border);">
+        <div>
+          <div style="font-size:13px;font-weight:500;">🔒 ${c.nombre}</div>
+          ${c.num ? `<div style="font-size:11px;color:var(--muted);margin-top:2px;">Cuota ${c.num}${c.tot?'/'+c.tot:''}</div>` : ''}
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:14px;font-weight:600;font-family:'DM Mono',monospace;color:var(--accent2);">${fmtFull(c.monto)}</span>
+          <button class="del-btn" onclick="deleteCuota('${c.id}')">×</button>
+        </div>
+      </div>`).join('') +
+      `<div style="display:flex;justify-content:space-between;padding:12px 0 0;font-weight:600;font-size:14px;">
+        <span>Total cuotas</span>
+        <span style="font-family:'DM Mono',monospace;color:var(--accent2);">${fmtFull(state.cuotas.reduce((s,c)=>s+c.monto,0))}</span>
+      </div>`;
+  }
+}
+
+let barChartInst = null, donutInst = null;
+
+function drawBarChart(spentByCat) {
+  const canvas = document.getElementById('barChart');
+  if (!canvas) return;
+  const cats = CATS.filter(c => c.id !== 'fijo');
+  const labels  = cats.map(c => c.icon + ' ' + c.label);
+  const spent   = cats.map(c => spentByCat[c.id]||0);
+  const budgets = cats.map(c => state.budgets[c.id]||0);
+  const colors  = cats.map(c => { const s=spentByCat[c.id]||0,b=state.budgets[c.id]||1; return s/b>=1?'#ef4444':s/b>=0.75?'#f59e0b':'#7c6aff'; });
+
+  if (barChartInst) { barChartInst.destroy(); barChartInst = null; }
+  const ctx = canvas.getContext('2d');
+  barChartInst = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label:'Gastado', data:spent, backgroundColor:colors, borderRadius:6, borderSkipped:false },
+        { label:'Presupuesto', data:budgets, backgroundColor:'rgba(255,255,255,0.05)', borderColor:'rgba(255,255,255,0.15)', borderWidth:1, borderRadius:6, borderSkipped:false },
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx => fmtFull(ctx.raw) } } },
+      scales:{
+        x:{ grid:{display:false}, ticks:{ color:'#6b6b85', font:{size:10} } },
+        y:{ grid:{color:'rgba(255,255,255,0.05)'}, ticks:{ color:'#6b6b85', callback: v => fmtCLP(v) } }
       }
     }
-    if(!results.length){
-      // Last resort: find any number that looks like a Chilean peso amount
-      const anyAmt=/\$?\s*([\d]{1,3}(?:\.[\d]{3})+|[\d]{4,7})/g;
-      let m2;
-      while((m2=anyAmt.exec(txt))!==null){
-        const monto=parseFloat(m2[1].replace(/\./g,''));
-        if(monto>=1000&&monto<=10000000){
-          // grab surrounding text as description
-          const start=Math.max(0,m2.index-40);
-          const end=Math.min(txt.length,m2.index+m2[0].length+40);
-          const desc=txt.slice(start,end).replace(/[\n\r]/g,' ').trim().slice(0,60);
-          results.push({id:uid(),monto,desc,cat:guessCat(desc),fecha:today});
-        }
-      }
-    }
-    if(!results.length){setError('No pude detectar cobros automáticamente. Prueba con el modo JSON o agrega el cobro manualmente con el botón +.');return}
-    // Deduplicate by monto+desc
-    const seen=new Set();
-    const unique=results.filter(r=>{const k=r.monto+'|'+r.desc;if(seen.has(k))return false;seen.add(k);return true});
-    setParsed(unique);
+  });
+}
+
+function drawDonut(spentByCat) {
+  const canvas = document.getElementById('donutChart');
+  const legend = document.getElementById('donut-legend');
+  if (!canvas) return;
+  const cats = CATS.filter(c=>(spentByCat[c.id]||0)>0);
+  if (!cats.length) { legend.innerHTML='<span style="color:var(--muted);font-size:12px;">Sin datos</span>'; return; }
+
+  const total = cats.reduce((s,c)=>s+(spentByCat[c.id]||0),0);
+  if (donutInst) { donutInst.destroy(); donutInst = null; }
+  const ctx = canvas.getContext('2d');
+  donutInst = new Chart(ctx, {
+    type:'doughnut',
+    data:{
+      labels: cats.map(c=>c.label),
+      datasets:[{ data: cats.map(c=>spentByCat[c.id]||0), backgroundColor: cats.map(c=>c.color), borderWidth:0, hoverOffset:4 }]
+    },
+    options:{ responsive:false, cutout:'72%', plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx => fmtFull(ctx.raw) } } } }
+  });
+
+  legend.innerHTML = cats.map(c => {
+    const pct = total > 0 ? Math.round((spentByCat[c.id]||0)/total*100) : 0;
+    return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:7px;">
+      <span style="width:8px;height:8px;border-radius:50%;background:${c.color};flex-shrink:0;"></span>
+      <span style="color:var(--muted);">${c.label}</span>
+      <span style="margin-left:auto;font-weight:500;">${pct}%</span>
+    </div>`;
+  }).join('');
+}
+
+function renderSettings() {
+  const cont = document.getElementById('budget-settings');
+  cont.innerHTML = CATS.map(cat => `
+    <div class="setting-row" onclick="openBudget('${cat.id}','${cat.label}')">
+      <div><div class="setting-label">${cat.icon} ${cat.label}</div><div class="setting-sub">Toca para editar</div></div>
+      <div class="setting-val">${fmtFull(state.budgets[cat.id]||0)}</div>
+    </div>`).join('');
+
+  const cuotasCont = document.getElementById('cuotas-list');
+  if (!state.cuotas.length) {
+    cuotasCont.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:8px 0;">Sin cuotas configuradas.</p>';
+    return;
   }
-
-  function confirm(){
-    if(!parsed?.length)return;
-    addTxs(parsed);
-    setParsed(null);setJsonText('');setFreeText('');
-    setSuccess('✅ '+parsed.length+' cobro(s) agregados correctamente.');
-    setTimeout(()=>setSuccess(''),3000);
-  }
-
-  function reset(){setParsed(null);setError('');setJsonText('');setFreeText('');}
-
-  const tabStyle=(active)=>({flex:1,padding:'10px 6px',background:active?'rgba(124,106,255,0.15)':'transparent',border:'none',borderBottom:`2px solid ${active?'#7c6aff':'transparent'}`,color:active?'#7c6aff':'#6b6b85',fontSize:13,fontWeight:active?600:400,fontFamily:'DM Sans,system-ui,sans-serif',cursor:'pointer',transition:'all 0.15s'});
-
-  return React.createElement('div',null,
-    React.createElement('div',{style:{padding:'52px 20px 16px',background:'linear-gradient(180deg,rgba(94,234,212,0.06) 0%,transparent 100%)'}},
-      React.createElement('h1',{style:{fontSize:26,fontWeight:600,letterSpacing:-0.5}},'Importar cobros'),
-      React.createElement('p',{style:{fontSize:13,color:'#6b6b85',marginTop:4}},'Dos formas de agregar gastos rápido')
-    ),
-
-    // Tabs
-    React.createElement('div',{style:{display:'flex',margin:'0 16px 12px',background:'#13131a',borderRadius:12,border:'0.5px solid rgba(255,255,255,0.07)',overflow:'hidden'}},
-      React.createElement('button',{style:tabStyle(mode==='text'),onClick:()=>{setMode('text');reset()}},'📱 Texto / Notificación'),
-      React.createElement('button',{style:tabStyle(mode==='json'),onClick:()=>{setMode('json');reset()}},'📋 JSON del coach')
-    ),
-
-    // Success
-    success&&React.createElement('div',{style:{margin:'0 16px 12px',padding:'12px 14px',borderRadius:10,background:'rgba(34,197,94,0.1)',border:'0.5px solid rgba(34,197,94,0.3)',fontSize:13,color:'#4ade80',fontWeight:500}},success),
-
-    // ── MODE: TEXT ──────────────────────────────────────────
-    mode==='text'&&React.createElement('div',null,
-      React.createElement('div',{style:{...S.card,background:'rgba(94,234,212,0.04)',border:'0.5px solid rgba(94,234,212,0.15)'}},
-        React.createElement('div',{style:{fontSize:12,color:'#5eead4',fontWeight:500,marginBottom:6}},'💡 Cómo usar'),
-        React.createElement('div',{style:{fontSize:12,color:'#6b6b85',lineHeight:1.8}},
-          '1. Copia el texto de la notificación del banco\n',
-          '2. Pégalo aquí abajo\n',
-          '3. Toca "Detectar cobros"\n',
-          '4. Revisa y confirma — si algo falla, corrígelo manualmente con +'
-        )
-      ),
-      React.createElement('div',{style:{margin:'0 16px 12px'}},
-        React.createElement('label',{style:{fontSize:12,color:'#6b6b85',marginBottom:6,display:'block',fontWeight:500,textTransform:'uppercase',letterSpacing:'0.05em'}},'Texto del cobro'),
-        React.createElement('textarea',{
-          style:{...S.input,minHeight:130,resize:'none',lineHeight:1.6,fontSize:14},
-          placeholder:'Ejemplos que funcionan:\n\n"Compra aprobada $5.690 en OXXO"\n"Cargo en cuenta: $15.990 - UBER EATS"\n"Shell $32.000 · Jumbo $45.200"',
-          value:freeText,
-          onChange:e=>{setFreeText(e.target.value);setError('');setParsed(null)}
-        })
-      ),
-      error&&React.createElement('div',{style:{margin:'0 16px 12px',padding:'10px 14px',borderRadius:10,background:'rgba(239,68,68,0.1)',border:'0.5px solid rgba(239,68,68,0.3)',fontSize:12,color:'#f87171'}},error),
-      !parsed&&React.createElement('div',{style:{margin:'0 16px'}},
-        React.createElement('button',{style:S.btn('primary'),onClick:parseText},'🔍 Detectar cobros')
-      )
-    ),
-
-    // ── MODE: JSON ──────────────────────────────────────────
-    mode==='json'&&React.createElement('div',null,
-      React.createElement('div',{style:{...S.card,background:'rgba(124,106,255,0.04)',border:'0.5px solid rgba(124,106,255,0.15)'}},
-        React.createElement('div',{style:{fontSize:12,color:'#a78bfa',fontWeight:500,marginBottom:6}},'💡 Cómo usar'),
-        React.createElement('div',{style:{fontSize:12,color:'#6b6b85',lineHeight:1.8}},
-          '1. Manda tus cobros al coach en este chat\n',
-          '2. El coach te responde con un bloque JSON\n',
-          '3. Copia todo ese JSON (desde [ hasta ])\n',
-          '4. Pégalo aquí y toca "Importar"'
-        ),
-        React.createElement('div',{style:{marginTop:10,padding:'8px 10px',background:'#1c1c26',borderRadius:8,fontSize:11,color:'#6b6b85',fontFamily:'DM Mono,monospace',lineHeight:1.6}},
-          '[{"desc":"OXXO","monto":5690,"cat":"comida","fecha":"2026-06-05"},',React.createElement('br'),
-          ' {"desc":"Uber Eats","monto":15990,"cat":"delivery","fecha":"2026-06-05"}]'
-        )
-      ),
-      React.createElement('div',{style:{margin:'0 16px 12px'}},
-        React.createElement('label',{style:{fontSize:12,color:'#6b6b85',marginBottom:6,display:'block',fontWeight:500,textTransform:'uppercase',letterSpacing:'0.05em'}},'JSON del coach'),
-        React.createElement('textarea',{
-          style:{...S.input,minHeight:130,resize:'none',lineHeight:1.6,fontSize:13,fontFamily:'DM Mono,monospace'},
-          placeholder:'[{"desc":"...","monto":0,"cat":"...","fecha":"2026-06-05"}]',
-          value:jsonText,
-          onChange:e=>{setJsonText(e.target.value);setError('');setParsed(null)}
-        })
-      ),
-      error&&React.createElement('div',{style:{margin:'0 16px 12px',padding:'10px 14px',borderRadius:10,background:'rgba(239,68,68,0.1)',border:'0.5px solid rgba(239,68,68,0.3)',fontSize:12,color:'#f87171'}},error),
-      !parsed&&React.createElement('div',{style:{margin:'0 16px'}},
-        React.createElement('button',{style:S.btn('primary'),onClick:parseJSON},'📥 Importar JSON')
-      )
-    ),
-
-    // ── PREVIEW ─────────────────────────────────────────────
-    parsed&&React.createElement('div',null,
-      React.createElement('div',{style:{fontSize:11,color:'#6b6b85',textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:500,padding:'16px 20px 8px'}},'Cobros detectados ('+parsed.length+')'),
-      React.createElement('div',{style:S.card},
-        parsed.map((t,i)=>{
-          const cat=CATS.find(c=>c.id===t.cat)||CATS[7];
-          return React.createElement('div',{key:i,style:{display:'flex',alignItems:'center',gap:12,padding:'10px 0',borderBottom:'0.5px solid rgba(255,255,255,0.07)'}},
-            React.createElement('div',{style:{width:34,height:34,borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,background:cat.bg,flexShrink:0}},cat.icon),
-            React.createElement('div',{style:{flex:1,minWidth:0}},
-              React.createElement('div',{style:{fontSize:13,fontWeight:500,whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}},t.desc),
-              React.createElement('div',{style:{fontSize:11,color:'#6b6b85',marginTop:1}},cat.label+' · '+t.fecha)
-            ),
-            React.createElement('div',{style:{fontSize:14,fontWeight:600,fontFamily:'DM Mono,monospace',color:'#ef4444',flexShrink:0}},'-'+fmtK(t.monto))
-          )
-        })
-      ),
-      React.createElement('div',{style:{margin:'0 16px'}},
-        React.createElement('button',{style:S.btn('primary'),onClick:confirm},'✅ Confirmar '+parsed.length+' cobro(s)'),
-        React.createElement('button',{style:S.btn('secondary'),onClick:reset},'Cancelar')
-      )
-    )
-  );
+  cuotasCont.innerHTML = state.cuotas.map(c => `
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">${c.nombre}</div>
+        <div class="setting-sub">${c.num&&c.tot ? 'Cuota '+c.num+'/'+c.tot : 'Recurrente'}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="setting-val">${fmtFull(c.monto)}</span>
+        <button class="del-btn" onclick="deleteCuota('${c.id}')">×</button>
+      </div>
+    </div>`).join('');
 }
 
-// ── CHARTS PAGE ───────────────────────────────────────────────
-function ChartsPage({monthTxs,rotTotal,cuotasTotal,grandTotal,meta,daysPassed,daysLeft,budgets,spentByCat,cuotas,isCurrentMonth}){
-  const barRef=useRef(null);const donutRef=useRef(null);
-  const barChart=useRef(null);const donutChart=useRef(null);
-  const avgDay=daysPassed>0?rotTotal/daysPassed:0;
-  const proj=grandTotal+avgDay*daysLeft;
-
-  useEffect(()=>{
-    if(!barRef.current)return;
-    if(barChart.current){barChart.current.destroy();barChart.current=null}
-    const cats=CATS.filter(c=>c.id!=='fijo');
-    barChart.current=new Chart(barRef.current,{
-      type:'bar',
-      data:{labels:cats.map(c=>c.icon+' '+c.label),datasets:[
-        {label:'Gastado',data:cats.map(c=>spentByCat[c.id]||0),backgroundColor:cats.map(c=>{const s=spentByCat[c.id]||0,b=budgets[c.id]||1;return s/b>=1?'#ef4444':s/b>=0.75?'#f59e0b':'#7c6aff'}),borderRadius:6,borderSkipped:false},
-        {label:'Presupuesto',data:cats.map(c=>budgets[c.id]||0),backgroundColor:'rgba(255,255,255,0.05)',borderColor:'rgba(255,255,255,0.12)',borderWidth:1,borderRadius:6,borderSkipped:false},
-      ]},
-      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmtFull(ctx.raw)}}},scales:{x:{grid:{display:false},ticks:{color:'#6b6b85',font:{size:10}}},y:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#6b6b85',callback:v=>fmtK(v)}}}}
-    });
-    return()=>{if(barChart.current){barChart.current.destroy();barChart.current=null}};
-  },[spentByCat,budgets]);
-
-  useEffect(()=>{
-    if(!donutRef.current)return;
-    if(donutChart.current){donutChart.current.destroy();donutChart.current=null}
-    const cats=CATS.filter(c=>(spentByCat[c.id]||0)>0);
-    if(!cats.length)return;
-    donutChart.current=new Chart(donutRef.current,{
-      type:'doughnut',
-      data:{labels:cats.map(c=>c.label),datasets:[{data:cats.map(c=>spentByCat[c.id]||0),backgroundColor:cats.map(c=>c.color),borderWidth:0,hoverOffset:4}]},
-      options:{responsive:false,cutout:'70%',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmtFull(ctx.raw)}}}}
-    });
-    return()=>{if(donutChart.current){donutChart.current.destroy();donutChart.current=null}};
-  },[spentByCat]);
-
-  const total2=CATS.reduce((s,c)=>s+(spentByCat[c.id]||0),0);
-
-  return React.createElement('div',null,
-    React.createElement('div',{style:{padding:'52px 20px 16px'}},
-      React.createElement('h1',{style:{fontSize:26,fontWeight:600,letterSpacing:-0.5}},'Análisis'),
-      React.createElement('p',{style:{fontSize:13,color:'#6b6b85',marginTop:4}},'Cómo vas vs presupuesto')
-    ),
-    React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,margin:'0 16px 12px'}},
-      [{val:fmtK(avgDay),lab:'Gasto diario promedio'},{val:fmtK(proj),lab:'Proyección al cierre',color:proj>meta?'#ef4444':'#22c55e'},{val:fmtK(grandTotal),lab:'Total acumulado'},{val:monthTxs.length,lab:'Movimientos'}].map((s,i)=>
-        React.createElement('div',{key:i,style:{background:'#13131a',border:'0.5px solid rgba(255,255,255,0.07)',borderRadius:14,padding:14}},
-          React.createElement('div',{style:{fontSize:20,fontWeight:600,fontFamily:'DM Mono,monospace',marginBottom:2,color:s.color||'#f0f0f8'}},s.val),
-          React.createElement('div',{style:{fontSize:11,color:'#6b6b85'}},s.lab)
-        )
-      )
-    ),
-    React.createElement('div',{style:{fontSize:11,color:'#6b6b85',textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:500,padding:'16px 20px 8px'}},'Gasto vs presupuesto'),
-    React.createElement('div',{style:S.card},React.createElement('div',{style:{position:'relative',height:220}},React.createElement('canvas',{ref:barRef,role:'img','aria-label':'Gráfico de barras gasto vs presupuesto por categoría'}))),
-    React.createElement('div',{style:{fontSize:11,color:'#6b6b85',textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:500,padding:'16px 20px 8px'}},'Distribución del mes'),
-    React.createElement('div',{style:{...S.card,display:'flex',alignItems:'center',gap:16}},
-      React.createElement('canvas',{ref:donutRef,width:120,height:120,style:{flexShrink:0},role:'img','aria-label':'Gráfico donut de distribución de gastos'}),
-      React.createElement('div',{style:{flex:1}},
-        CATS.filter(c=>(spentByCat[c.id]||0)>0).map(c=>{
-          const pct=total2>0?Math.round((spentByCat[c.id]||0)/total2*100):0;
-          return React.createElement('div',{key:c.id,style:{display:'flex',alignItems:'center',gap:6,marginBottom:7}},
-            React.createElement('span',{style:{width:8,height:8,borderRadius:'50%',background:c.color,flexShrink:0}}),
-            React.createElement('span',{style:{fontSize:12,color:'#6b6b85',flex:1}},c.label),
-            React.createElement('span',{style:{fontSize:12,fontWeight:500}},pct+'%')
-          )
-        })
-      )
-    ),
-    React.createElement('div',{style:{fontSize:11,color:'#6b6b85',textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:500,padding:'16px 20px 8px'}},'Cuotas fijas del período'),
-    React.createElement('div',{style:S.card},
-      cuotas.length===0
-        ?React.createElement('p',{style:{fontSize:13,color:'#6b6b85'}},'Sin cuotas configuradas.')
-        :React.createElement('div',null,
-          cuotas.map(c=>React.createElement('div',{key:c.id,style:{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'10px 0',borderBottom:'0.5px solid rgba(255,255,255,0.07)'}},
-            React.createElement('div',null,
-              React.createElement('div',{style:{fontSize:13,fontWeight:500}},'🔒 '+c.nombre),
-              c.num&&React.createElement('div',{style:{fontSize:11,color:'#6b6b85',marginTop:2}},'Cuota '+c.num+(c.tot?'/'+c.tot:''))
-            ),
-            React.createElement('span',{style:{fontSize:14,fontWeight:600,fontFamily:'DM Mono,monospace',color:'#5eead4'}},fmtFull(c.monto))
-          )),
-          React.createElement('div',{style:{display:'flex',justifyContent:'space-between',padding:'12px 0 0',fontWeight:600,fontSize:14}},
-            React.createElement('span',null,'Total cuotas'),
-            React.createElement('span',{style:{fontFamily:'DM Mono,monospace',color:'#5eead4'}},fmtFull(cuotas.reduce((s,c)=>s+c.monto,0)))
-          )
-        )
-    )
-  );
+// ── ACTIONS ──────────────────────────────────────────────────
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('p-'+name).classList.add('active');
+  btn.classList.add('active');
+  document.getElementById('screen').scrollTop = 0;
+  render();
 }
 
-// ── SETTINGS PAGE ─────────────────────────────────────────────
-function SettingsPage({budgets,setBudgets,meta,setMeta,cuotas,deleteCuota,cqNombre,setCqNombre,cqMonto,setCqMonto,cqNum,setCqNum,cqTot,setCqTot,cuotaOpen,setCuotaOpen,saveCuota,setTxs}){
-  const[editCat,setEditCat]=useState(null);
-  const[editVal,setEditVal]=useState('');
-  const[newMeta,setNewMeta]=useState('');
-  const[editMetaOpen,setEditMetaOpen]=useState(false);
-
-  return React.createElement('div',null,
-    React.createElement('div',{style:{padding:'52px 20px 16px'}},
-      React.createElement('h1',{style:{fontSize:26,fontWeight:600,letterSpacing:-0.5}},'Configuración'),
-      React.createElement('p',{style:{fontSize:13,color:'#6b6b85',marginTop:4}},'Presupuestos y cuotas')
-    ),
-    // Meta
-    React.createElement('div',{style:{fontSize:11,color:'#6b6b85',textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:500,padding:'0 20px 8px'}},'Meta mensual'),
-    React.createElement('div',{style:S.card},
-      React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between'}},
-        React.createElement('div',null,
-          React.createElement('div',{style:{fontSize:14,fontWeight:500}},'Facturación máxima'),
-          React.createElement('div',{style:{fontSize:12,color:'#6b6b85',marginTop:2}},'Límite total del mes')
-        ),
-        React.createElement('div',{style:{fontSize:14,color:'#7c6aff',fontWeight:500,fontFamily:'DM Mono,monospace',cursor:'pointer'},onClick:()=>{setNewMeta(meta);setEditMetaOpen(true)}},fmtFull(meta))
-      )
-    ),
-    // Budgets
-    React.createElement('div',{style:{fontSize:11,color:'#6b6b85',textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:500,padding:'16px 20px 8px'}},'Presupuesto por categoría'),
-    React.createElement('div',{style:S.card},
-      CATS.map(cat=>React.createElement('div',{key:cat.id,style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 0',borderBottom:'0.5px solid rgba(255,255,255,0.07)',cursor:'pointer'},onClick:()=>{setEditCat(cat);setEditVal(budgets[cat.id]||0)}},
-        React.createElement('div',null,
-          React.createElement('div',{style:{fontSize:14,fontWeight:500}},cat.icon+' '+cat.label),
-          React.createElement('div',{style:{fontSize:12,color:'#6b6b85',marginTop:2}},'Toca para editar')
-        ),
-        React.createElement('div',{style:{fontSize:14,color:'#7c6aff',fontWeight:500,fontFamily:'DM Mono,monospace'}},fmtFull(budgets[cat.id]||0))
-      ))
-    ),
-    // Cuotas
-    React.createElement('div',{style:{fontSize:11,color:'#6b6b85',textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:500,padding:'16px 20px 8px'}},'Cuotas fijas del período'),
-    React.createElement('div',{style:S.card},
-      cuotas.map(c=>React.createElement('div',{key:c.id,style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 0',borderBottom:'0.5px solid rgba(255,255,255,0.07)'}},
-        React.createElement('div',null,
-          React.createElement('div',{style:{fontSize:14,fontWeight:500}},c.nombre),
-          c.num&&React.createElement('div',{style:{fontSize:12,color:'#6b6b85',marginTop:2}},'Cuota '+c.num+(c.tot?'/'+c.tot:''))
-        ),
-        React.createElement('div',{style:{display:'flex',alignItems:'center',gap:10}},
-          React.createElement('span',{style:{fontSize:14,color:'#5eead4',fontWeight:500,fontFamily:'DM Mono,monospace'}},fmtFull(c.monto)),
-          React.createElement('button',{onClick:()=>deleteCuota(c.id),style:{background:'none',border:'none',color:'#6b6b85',fontSize:18,cursor:'pointer',padding:'4px 6px'}},'×')
-        )
-      )),
-      React.createElement('button',{style:{...S.btn('secondary'),marginTop:12},onClick:()=>setCuotaOpen(true)},'+ Agregar cuota')
-    ),
-    // Data
-    React.createElement('div',{style:{fontSize:11,color:'#6b6b85',textTransform:'uppercase',letterSpacing:'0.1em',fontWeight:500,padding:'16px 20px 8px'}},'Datos'),
-    React.createElement('div',{style:S.card},
-      React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 0'}},
-        React.createElement('div',null,
-          React.createElement('div',{style:{fontSize:14,fontWeight:500}},'Limpiar movimientos del mes'),
-          React.createElement('div',{style:{fontSize:12,color:'#6b6b85',marginTop:2}},'Borra solo el mes actual')
-        ),
-        React.createElement('button',{onClick:()=>{if(confirm('¿Borrar movimientos del mes actual?'))setTxs(prev=>{const now=new Date();return prev.filter(t=>{const d=new Date(t.fecha+'T12:00:00');return!(d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear())})})},style:{background:'rgba(239,68,68,0.1)',border:'0.5px solid rgba(239,68,68,0.3)',borderRadius:8,padding:'6px 12px',color:'#f87171',fontSize:13,cursor:'pointer'}},'Limpiar')
-      )
-    ),
-    React.createElement('div',{style:{height:20}}),
-
-    // Modal editar presupuesto
-    editCat&&React.createElement('div',{style:S.modalBg,onClick:e=>{if(e.target===e.currentTarget)setEditCat(null)}},
-      React.createElement('div',{style:S.modal},
-        React.createElement('div',{style:{width:36,height:4,background:'rgba(255,255,255,0.1)',borderRadius:99,margin:'0 auto 20px'}}),
-        React.createElement('h2',{style:{fontSize:18,fontWeight:600,marginBottom:20}},'Presupuesto: '+editCat.label),
-        React.createElement('input',{style:S.input,type:'number',inputMode:'numeric',value:editVal,onChange:e=>setEditVal(e.target.value)}),
-        React.createElement('button',{style:S.btn('primary'),onClick:()=>{setBudgets(prev=>({...prev,[editCat.id]:parseFloat(editVal)||0}));setEditCat(null)}},'Guardar'),
-        React.createElement('button',{style:S.btn('secondary'),onClick:()=>setEditCat(null)},'Cancelar')
-      )
-    ),
-    // Modal editar meta
-    editMetaOpen&&React.createElement('div',{style:S.modalBg,onClick:e=>{if(e.target===e.currentTarget)setEditMetaOpen(false)}},
-      React.createElement('div',{style:S.modal},
-        React.createElement('div',{style:{width:36,height:4,background:'rgba(255,255,255,0.1)',borderRadius:99,margin:'0 auto 20px'}}),
-        React.createElement('h2',{style:{fontSize:18,fontWeight:600,marginBottom:20}},'Meta mensual'),
-        React.createElement('input',{style:S.input,type:'number',inputMode:'numeric',value:newMeta,onChange:e=>setNewMeta(e.target.value)}),
-        React.createElement('button',{style:S.btn('primary'),onClick:()=>{setMeta(parseFloat(newMeta)||800000);setEditMetaOpen(false)}},'Guardar'),
-        React.createElement('button',{style:S.btn('secondary'),onClick:()=>setEditMetaOpen(false)},'Cancelar')
-      )
-    ),
-    // Modal agregar cuota
-    cuotaOpen&&React.createElement('div',{style:S.modalBg,onClick:e=>{if(e.target===e.currentTarget)setCuotaOpen(false)}},
-      React.createElement('div',{style:S.modal},
-        React.createElement('div',{style:{width:36,height:4,background:'rgba(255,255,255,0.1)',borderRadius:99,margin:'0 auto 20px'}}),
-        React.createElement('h2',{style:{fontSize:18,fontWeight:600,marginBottom:20}},'Agregar cuota fija'),
-        React.createElement('div',{style:{marginBottom:16}},
-          React.createElement('label',{style:{fontSize:12,color:'#6b6b85',marginBottom:6,display:'block',fontWeight:500}},'Nombre'),
-          React.createElement('input',{style:S.input,type:'text',placeholder:'ej: Scotiabank CAE',value:cqNombre,onChange:e=>setCqNombre(e.target.value)})
-        ),
-        React.createElement('div',{style:{marginBottom:16}},
-          React.createElement('label',{style:{fontSize:12,color:'#6b6b85',marginBottom:6,display:'block',fontWeight:500}},'Monto ($)'),
-          React.createElement('input',{style:S.input,type:'number',inputMode:'numeric',placeholder:'0',value:cqMonto,onChange:e=>setCqMonto(e.target.value)})
-        ),
-        React.createElement('div',{style:{marginBottom:16}},
-          React.createElement('label',{style:{fontSize:12,color:'#6b6b85',marginBottom:6,display:'block',fontWeight:500}},'Cuota N° / Total (opcional)'),
-          React.createElement('div',{style:{display:'flex',gap:8}},
-            React.createElement('input',{style:{...S.input,flex:1},type:'number',inputMode:'numeric',placeholder:'ej: 2',value:cqNum,onChange:e=>setCqNum(e.target.value)}),
-            React.createElement('input',{style:{...S.input,flex:1},type:'number',inputMode:'numeric',placeholder:'ej: 3',value:cqTot,onChange:e=>setCqTot(e.target.value)})
-          )
-        ),
-        React.createElement('button',{style:S.btn('primary'),onClick:saveCuota},'Agregar cuota'),
-        React.createElement('button',{style:S.btn('secondary'),onClick:()=>setCuotaOpen(false)},'Cancelar')
-      )
-    )
-  );
+function openAddGasto() {
+  const today = new Date();
+  const yyyy  = today.getFullYear();
+  const mm    = String(today.getMonth()+1).padStart(2,'0');
+  const dd    = String(today.getDate()).padStart(2,'0');
+  document.getElementById('f-fecha').value = `${yyyy}-${mm}-${dd}`;
+  document.getElementById('f-monto').value = '';
+  document.getElementById('f-desc').value  = '';
+  state.selCat = 'comida';
+  renderCatGrid();
+  document.getElementById('modal-gasto').classList.add('open');
+  setTimeout(()=>document.getElementById('f-monto').focus(), 300);
 }
 
-createRoot(document.getElementById('root')).render(React.createElement(App));
+function renderCatGrid() {
+  document.getElementById('cat-grid').innerHTML = CATS.map(c => `
+    <div class="cat-chip ${state.selCat===c.id?'sel':''}" onclick="selCat('${c.id}')">
+      <span class="cat-chip-icon">${c.icon}</span>${c.label}
+    </div>`).join('');
+}
+
+function selCat(id) { state.selCat = id; renderCatGrid(); }
+
+function saveGasto() {
+  const monto = parseFloat(document.getElementById('f-monto').value);
+  const desc  = document.getElementById('f-desc').value.trim();
+  const fecha = document.getElementById('f-fecha').value;
+  if (!monto || monto <= 0 || !desc || !fecha) { alert('Completa todos los campos'); return; }
+
+  const tx = { id: Date.now().toString(), monto, desc, fecha, cat: state.selCat };
+  state.txs.push(tx);
+  save('txs', state.txs);
+  closeModal('modal-gasto');
+  render();
+}
+
+function deleteTx(id) {
+  state.txs = state.txs.filter(t=>t.id!==id);
+  save('txs', state.txs);
+  render();
+}
+
+function openAddCuota() {
+  document.getElementById('cq-nombre').value = '';
+  document.getElementById('cq-monto').value  = '';
+  document.getElementById('cq-num').value    = '';
+  document.getElementById('cq-tot').value    = '';
+  document.getElementById('modal-cuota').classList.add('open');
+}
+
+function saveCuota() {
+  const nombre = document.getElementById('cq-nombre').value.trim();
+  const monto  = parseFloat(document.getElementById('cq-monto').value);
+  const num    = parseInt(document.getElementById('cq-num').value) || null;
+  const tot    = parseInt(document.getElementById('cq-tot').value) || null;
+  if (!nombre || !monto) { alert('Nombre y monto son obligatorios'); return; }
+  state.cuotas.push({ id: Date.now().toString(), nombre, monto, num, tot });
+  save('cuotas', state.cuotas);
+  closeModal('modal-cuota');
+  render();
+}
+
+function deleteCuota(id) {
+  state.cuotas = state.cuotas.filter(c=>c.id!==id);
+  save('cuotas', state.cuotas);
+  render();
+}
+
+function openBudget(catId, catLabel) {
+  document.getElementById('mb-title').textContent = 'Presupuesto: ' + catLabel;
+  document.getElementById('mb-cat').value  = catId;
+  document.getElementById('mb-val').value  = state.budgets[catId] || 0;
+  document.getElementById('modal-budget').classList.add('open');
+}
+
+function saveBudget() {
+  const cat = document.getElementById('mb-cat').value;
+  const val = parseFloat(document.getElementById('mb-val').value);
+  if (isNaN(val) || val < 0) return;
+  state.budgets[cat] = val;
+  save('budgets', state.budgets);
+  closeModal('modal-budget');
+  render();
+}
+
+function editMeta() {
+  const val = prompt('Meta mensual ($)', state.meta);
+  const n   = parseFloat(val);
+  if (!isNaN(n) && n > 0) { state.meta = n; save('meta', n); render(); }
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function exportData() {
+  const data = JSON.stringify({ meta:state.meta, budgets:state.budgets, cuotas:state.cuotas, txs:state.txs }, null, 2);
+  try { navigator.clipboard.writeText(data).then(()=>alert('Datos copiados al portapapeles ✓')); }
+  catch(e) { alert('No se pudo copiar. Usa Safari para esta función.'); }
+}
+
+function clearMonth() {
+  if (!confirm('¿Borrar todos los movimientos del mes actual?')) return;
+  const now = new Date();
+  state.txs = state.txs.filter(t => {
+    const d = new Date(t.fecha+'T12:00:00');
+    return !(d.getMonth()===state.viewMonth && d.getFullYear()===state.viewYear);
+  });
+  save('txs', state.txs);
+  render();
+}
+
+// Close modals on bg tap
+document.querySelectorAll('.modal-bg').forEach(bg => {
+  bg.addEventListener('click', e => { if(e.target===bg) bg.classList.remove('open'); });
+});
+
+// ── INIT ─────────────────────────────────────────────────────
+window.addEventListener('load', () => { render(); });
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 </body>
 </html>
